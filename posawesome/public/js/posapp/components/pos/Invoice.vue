@@ -542,15 +542,6 @@ export default {
       const delivery_charges = this.flt(this.delivery_charges_rate);
       sum += delivery_charges;
       
-      // Add taxes
-      if (this.invoice_doc && this.invoice_doc.taxes) {
-        this.invoice_doc.taxes.forEach(tax => {
-          if (tax.tax_amount) {
-            sum += flt(tax.tax_amount);
-          }
-        });
-      }
-      
       return this.flt(sum, this.currency_precision);
     },
     // Calculate total discount amount for all items
@@ -4141,9 +4132,7 @@ export default {
         });
       }
     });
-    this.eventBus.on("add_item", (item) => {
-      this.add_item(item);
-    });
+    this.eventBus.on("add_item", this.add_item);
     this.eventBus.on("update_customer", (customer) => {
       this.customer = customer;
     });
@@ -4227,6 +4216,8 @@ export default {
     this.eventBus.on("reset_posting_date", () => {
       this.posting_date = frappe.datetime.nowdate();
     });
+    this.eventBus.on("open_variants_model", this.open_variants_model);
+    this.eventBus.on("calc_uom", this.calc_uom);
   },
   // Cleanup event listeners before component is destroyed
   beforeUnmount() {
